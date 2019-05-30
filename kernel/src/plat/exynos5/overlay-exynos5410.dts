@@ -1,0 +1,48 @@
+/*
+ * Copyright 2018, Data61
+ * Commonwealth Scientific and Industrial Research Organisation (CSIRO)
+ * ABN 41 687 119 230.
+ *
+ * This software may be distributed and modified according to the terms of
+ * the GNU General Public License version 2. Note that NO WARRANTY is provided.
+ * See "LICENSE_GPLv2.txt" for details.
+ *
+ * @TAG(DATA61_GPL)
+ */
+
+/ {
+	/* pick the right boot CPU */
+	chosen {
+		seL4,boot-cpu = <&{/cpus/cpu@0}>;
+	};
+	/* The architecture timer on exynos5 depends on the MCT, but it is there. */
+	timer {
+		compatible = "arm,armv7-timer";
+		interrupts = <0x1 0xd 0xf08>, <0x1 0xe 0xf08>, <0x1 0xb 0xf08>, <0x1 0xa 0xf08>;
+		clock-frequency = <0x16e3600>;
+	};
+
+	/* Mainline Linux does not have these SPI nodes, but we want to include them. */
+	spi@12d20000 {
+		compatible = "samsung,exynos4210-spi";
+		reg = <0x12d20000 0x100>;
+	};
+
+	spi@12d30000 {
+		compatible = "samsung,exynos4210-spi";
+		reg = <0x12d30000 0x100>;
+	};
+
+	spi@12d40000 {
+		compatible = "samsung,exynos4210-spi";
+		reg = <0x12d40000 0x100>;
+	};
+
+	memory@40000000 {
+		reg = <0x60000000 0x5ea00000>;
+	};
+
+	vm-memory@40000000 {
+		reg = <0x40000000 0x20000000>;
+	};
+};
