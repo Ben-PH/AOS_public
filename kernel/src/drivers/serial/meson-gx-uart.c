@@ -41,6 +41,8 @@
 static const char *reset = "reset";
 static int index = 0;
 
+void putDebugChar(unsigned char c);
+
 void init_serial(void)
 {
     /* enable tx, rx and rx irq */
@@ -72,7 +74,6 @@ void handleUartIRQ(void)
     }
 }
 
-#if defined(CONFIG_DEBUG_BUILD) || defined(CONFIG_PRINTING)
 void putDebugChar(unsigned char c)
 {
     while ((*UART_REG(UART_STATUS) & UART_TX_FULL));
@@ -80,7 +81,6 @@ void putDebugChar(unsigned char c)
     /* Add character to the buffer. */
     *UART_REG(UART_WFIFO) = c;
 }
-#endif
 
 #ifdef CONFIG_DEBUG_BUILD
 unsigned char getDebugChar(void)

@@ -232,7 +232,6 @@ devices:
       - executeNever: true
         index: 0
         kernel: UART_PPTR
-        macro: CONFIG_PRINTING
         user: true
     interrupts:
       KERNEL_UART_IRQ: 0
