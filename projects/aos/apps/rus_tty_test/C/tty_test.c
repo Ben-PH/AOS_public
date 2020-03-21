@@ -29,6 +29,7 @@
 
 #include "ttyout.h"
 
+uint32_t tty_main();
 // Block a thread forever
 // we do this by making an unimplemented system call.
 static void thread_block(void)
@@ -50,6 +51,8 @@ int main(void)
 
     /* initialise communication */
     ttyout_init();
+
+    printf("rust gave us %d\n", tty_main());
 
     do {
         printf("task:\tHello world, I'm\ttty_test!\n");

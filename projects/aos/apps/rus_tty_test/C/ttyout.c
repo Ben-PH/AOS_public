@@ -49,6 +49,7 @@ static size_t sos_debug_print(const void *vData, size_t count)
 size_t sos_write(void *vData, size_t count)
 {
     //implement this to use your syscall
+  sos_debug_print("and foo\n", 8);
     return sos_debug_print(vData, count);
 }
 

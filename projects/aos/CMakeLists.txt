@@ -27,7 +27,7 @@ function(add_app app)
 endfunction()
 
 # add apps
-add_subdirectory(apps/tty_test)
+add_subdirectory(apps/rus_tty_test)
 add_subdirectory(apps/sosh)
 # add any additional apps here
 

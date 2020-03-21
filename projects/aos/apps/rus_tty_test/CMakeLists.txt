@@ -15,9 +15,9 @@ project(tty_test C)
 
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -u __vsyscall_ptr")
 
-add_executable(tty_test EXCLUDE_FROM_ALL src/ttyout.c src/tty_test.c)
+add_executable(tty_test EXCLUDE_FROM_ALL C/ttyout.c C/tty_test.c)
 target_include_directories(tty_test PRIVATE include)
-target_link_libraries(tty_test muslc sel4 sosapi)
+target_link_libraries(tty_test muslc sel4 sosapi ${CMAKE_CURRENT_SOURCE_DIR}/target/aarch64-unknown-linux-musl/release/librus_tty_test.a)
 
 # warn about everything
 add_compile_options(-Wall -Werror -W -Wextra)

@@ -8,4 +8,4 @@
 fn panic(_info: &core::panic::PanicInfo) -> ! {loop{}}
 
 #[no_mangle]
-fn tty_main(){}
+extern "C" fn tty_main() -> u32 { 8 }
