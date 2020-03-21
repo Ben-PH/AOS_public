@@ -28,8 +28,8 @@ config_choice(
         from being inlined. \
     public->When set to true will make all user facing functions available as \
         public symbols, which can be convenient for some language bindings."
-    "inline;LibSel4FunctionAttributeInline;LIB_SEL4_INLINE_INVOCATIONS"
-    "default;LibSel4FunctionAttributeDefault;LIB_SEL4_DEFAULT_FUNCTION_ATTRIBUTES"
+    # "inline;LibSel4FunctionAttributeInline;LIB_SEL4_INLINE_INVOCATIONS"
+    # "default;LibSel4FunctionAttributeDefault;LIB_SEL4_DEFAULT_FUNCTION_ATTRIBUTES"
     "public;LibSel4FunctionAttributePublic;LIB_SEL4_PUBLIC_SYMBOLS"
 )
 
