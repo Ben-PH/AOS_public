@@ -212,7 +212,7 @@ static uintptr_t init_process_stack(cspace_t *cspace, seL4_CPtr local_vspace, el
     void *local_stack_top  = (seL4_Word *) SOS_SCRATCH;
     uintptr_t local_stack_bottom = SOS_SCRATCH - PAGE_SIZE_4K;
 
-    /* find the vsyscall table */
+    /* find the vsyscall table by finding __vsyscall section in the elf-structure */
     uintptr_t sysinfo = *((uintptr_t *) elf_getSectionNamed(elf_file, "__vsyscall", NULL));
     if (sysinfo == 0) {
         ZF_LOGE("could not find syscall table for c library");
