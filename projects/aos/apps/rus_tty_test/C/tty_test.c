@@ -52,8 +52,6 @@ int main(void)
     /* initialise communication */
     ttyout_init();
 
-    printf("rust gave us %d\n", tty_main());
-
     do {
         printf("task:\tHello world, I'm\ttty_test!\n");
         thread_block();

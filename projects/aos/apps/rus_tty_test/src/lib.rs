@@ -7,5 +7,17 @@
 #[panic_handler]
 fn panic(_info: &core::panic::PanicInfo) -> ! {loop{}}
 
+extern "C" {
+    fn seL4_DebugPutChar(c: u8);
+}
+
+fn tty_debug_print(string: &[u8]) -> usize {
+    string.iter().for_each(|i| unsafe {seL4_DebugPutChar(*i)});
+    string.len()
+}
+
 #[no_mangle]
-extern "C" fn tty_main() -> u32 { 8 }
+extern "C" fn tty_main() -> u32 {
+    tty_debug_print(b"rust says foobar!\n");
+    1
+}
