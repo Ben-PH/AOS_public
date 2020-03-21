@@ -7,9 +7,29 @@ mod debug_print;
 #[panic_handler]
 fn panic(_info: &core::panic::PanicInfo) -> ! {loop{}}
 
+extern "C" {
+    // fn seL4_SetMR(u64, u64);
+    // fn seL4_Call(u64, u64);
+}
+
+fn thread_block() {
+    /* construct some info about the IPC message tty_test will send
+     * to sos -- it's 1 word long */
+    // seL4_MessageInfo_t tag = seL4_MessageInfo_new(0, 0, 0, 1);
+    /* Set the first word in the message to 0 */
+    // seL4_SetMR(0, 1);
+    /* Now send the ipc -- call will send the ipc, then block until a reply
+     * message is received */
+    // seL4_Call(SYSCALL_ENDPOINT_SLOT, tag);
+    /* Currently SOS does not reply -- so we never come back here */
+}
 
 #[no_mangle]
-extern "C" fn tty_main() -> u32 {
+extern "C" fn tty_main() -> ! {
     dbg_println!("what _print?!?!?!");
-    1
+    loop {
+        // dummy_printf("task:\tHello world, I'm\trus_tty_test!\n");
+        thread_block();
+
+    }
 }

@@ -29,7 +29,7 @@
 
 #include "ttyout.h"
 
-uint32_t tty_main();
+void tty_main();
 // Block a thread forever
 // we do this by making an unimplemented system call.
 static void thread_block(void)
@@ -52,12 +52,8 @@ int main(void)
     /* initialise communication */
     ttyout_init();
     tty_main();
-
-    do {
-        printf("task:\tHello world, I'm\ttty_test!\n");
-        thread_block();
-        // sleep(1);    // Implement this as a syscall
-    } while (1);
+    printf("what aro you doing here, tty main should have been inf-looping");
+    abort();
 
     return 0;
 }
