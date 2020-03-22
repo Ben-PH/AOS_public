@@ -51,9 +51,13 @@ int main(void)
 
     /* initialise communication */
     ttyout_init();
+
+
+
     tty_main();
-    printf("what aro you doing here, tty main should have been inf-looping");
-    abort();
+
+    printf("what are you doing here, tty main should have blocked\n");
+    /* abort(); */
 
     return 0;
 }
