@@ -42,11 +42,11 @@ NOTE: The project does this with `tools/seL4/cmake-tool/helpers/rootserver.cmake
 6. setup cspace, ut manager, and dma
 7. allow for uart output NOTE: In debug, this is shared with kernel
 8. expand the stack and run on that
-9. initialise the IRQ dispatch system TODO: .md writeups on the details of `sos_init_irq_dispatch()`s role as a component in the system
+9. initialise the IRQ dispatch system 
 10. initialise the frame table with the root-servers cspace, and its VSpace
-11. runs tests on this cspace. TODO: .md writeup on this fn
-12. init the network stack. TODO: .md writup on what the args do
-13. init the serial device
-14. `start_first_process()` a name (initially `"tty_test"`), and `ipc_ep` capability, which was initialised in `sos_ipc_init(endpointCP, notificactionCP)` TODO: .md writeup on `start_first proc`
-15. jumps straight into `syscall_loop` with the same `ipc_ep` as its argument.
+11. runs tests on this cspace, dma, and frame-tabling.
 12. map in the timer device. TODO: writeup as a case study for mapping in device
+13. init the network stack. TODO: .md writup on what the args do
+14. init the serial device
+15. `start_first_process()` a name (initially `"tty_test"`), and `ipc_ep` capability, which was initialised in `sos_ipc_init(endpointCP, notificactionCP)`
+16. jumps straight into `syscall_loop` with the same `ipc_ep` as its argument.
