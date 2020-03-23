@@ -126,7 +126,7 @@ void handle_syscall(UNUSED seL4_Word badge, UNUSED int num_args)
         break;
 
     case 2:
-        ZF_LOGE("got syscall 2, this will become a serial send routine");
+        ZF_LOGE("syscall2: with this implemented, rusts .a binary implements sos_write");
         break;
 
     default:

@@ -54,9 +54,10 @@ int main(void)
 
 
 
-    tty_main();
 
     printf("what are you doing here, tty main should have blocked\n");
+    for (uint64_t i = 0; i < ((uint64_t)1<<35); i++) {}
+    thread_block();
     /* abort(); */
 
     return 0;
