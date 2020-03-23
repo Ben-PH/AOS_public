@@ -55,6 +55,7 @@
 #define TTY_PRIORITY         (0)
 #define TTY_EP_BADGE         (101)
 
+static struct serial *serial;
 /*
  * A dummy starting syscall
  */
@@ -119,6 +120,13 @@ void handle_syscall(UNUSED seL4_Word badge, UNUSED int num_args)
         /* Free the slot we allocated for the reply - it is now empty, as the reply
          * capability was consumed by the send. */
         cspace_free_slot(&cspace, reply);
+        break;
+    case 1:
+        ZF_LOGE("got syscall 1, which we are intentionally not replying to");
+        break;
+
+    case 2:
+        ZF_LOGE("got syscall 2, this will become a serial send routine");
         break;
 
     default:
@@ -518,6 +526,8 @@ NORETURN void *main_continued(UNUSED void *arg)
     start_timer(timer_vaddr);
     /* You will need to register an IRQ handler for the timer here.
      * See "irq.h". */
+    serial = serial_init();
+    serial_send(serial, "1 blocks\n", 9);
 
     /* Start the user application */
     printf("Start first process\n");
