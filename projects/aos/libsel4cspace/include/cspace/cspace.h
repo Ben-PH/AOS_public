@@ -328,10 +328,7 @@ static inline seL4_Error cspace_revoke(cspace_t *cspace, seL4_CPtr cptr)
  * This function move the reply capability generated in the process of receiving IPC and moves it
  * from the TCB into the destination cspace.
  */
-static inline seL4_Error cspace_save_reply_cap(cspace_t *cspace, seL4_CPtr cptr)
-{
-    return seL4_CNode_SaveCaller(cspace->root_cnode, cptr, seL4_WordBits);
-}
+seL4_Error cspace_save_reply_cap(cspace_t *cspace, seL4_CPtr cptr);
 
 /**
  * Create an IRQ handler capability in a cptr in the specified cspace.

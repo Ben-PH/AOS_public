@@ -421,3 +421,8 @@ seL4_Error cspace_untyped_retype(cspace_t *cspace, seL4_CPtr ut, seL4_CPtr targe
 
     }
 }
+
+seL4_Error cspace_save_reply_cap(cspace_t *cspace, seL4_CPtr cptr)
+{
+  return seL4_CNode_SaveCaller(cspace->root_cnode, cptr, seL4_WordBits);
+}
