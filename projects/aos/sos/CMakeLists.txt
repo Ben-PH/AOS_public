@@ -48,6 +48,7 @@ add_executable(
     src/frame_table.c
     src/irq.c
     src/main.c
+    src/main_loop.c
     src/mapping.c
     src/network.c
     src/ut.c

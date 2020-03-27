@@ -36,6 +36,7 @@
 #include "elfload.h"
 #include "syscalls.h"
 #include "tests.h"
+#include "main_loop.h"
 
 #include <aos/vsyscall.h>
 
@@ -48,19 +49,31 @@
  * All badged IRQs set high bet, then we use uniqe bits to
  * distinguish interrupt sources.
  */
-#define IRQ_EP_BADGE         BIT(seL4_BadgeBits - 1ul)
 #define IRQ_IDENT_BADGE_BITS MASK(seL4_BadgeBits - 1ul)
 
-#define TTY_NAME             "tty_test"
 #define TTY_PRIORITY         (0)
 #define TTY_EP_BADGE         (101)
 
-static struct serial *serial;
-/*
- * A dummy starting syscall
- */
-#define SOS_SYSCALL0 0
+// TODO clear this up when happy with it being in main_loop.c?
+struct serial *serial;
 
+#define TTY_NAME             "tty_test"
+
+static struct {
+  ut_t *tcb_ut;
+  seL4_CPtr tcb;
+  ut_t *vspace_ut;
+  seL4_CPtr vspace;
+
+  ut_t *ipc_buffer_ut;
+  seL4_CPtr ipc_buffer;
+
+  cspace_t cspace;
+
+  ut_t *stack_ut;
+  seL4_CPtr stack;
+} tty_test_process;
+static cspace_t cspace;
 /* The linker will link this symbol to the start address  *
  * of an archive of attached applications.                */
 extern char _cpio_archive[];
@@ -69,103 +82,7 @@ extern char __eh_frame_start[];
 /* provided by gcc */
 extern void (__register_frame)(void *);
 
-/* root tasks cspace */
-static cspace_t cspace;
-
 /* the one process we start */
-static struct {
-    ut_t *tcb_ut;
-    seL4_CPtr tcb;
-    ut_t *vspace_ut;
-    seL4_CPtr vspace;
-
-    ut_t *ipc_buffer_ut;
-    seL4_CPtr ipc_buffer;
-
-    cspace_t cspace;
-
-    ut_t *stack_ut;
-    seL4_CPtr stack;
-} tty_test_process;
-
-void handle_syscall(UNUSED seL4_Word badge, UNUSED int num_args)
-{
-
-    /* allocate a slot for the reply cap */
-    seL4_CPtr reply = cspace_alloc_slot(&cspace);
-    /* get the first word of the message, which in the SOS protocol is the number
-     * of the SOS "syscall". */
-    seL4_Word syscall_number = seL4_GetMR(0);
-    /* Save the reply capability of the caller. If we didn't do this,
-     * we coud just use seL4_Reply to respond directly to the reply capability.
-     * However if SOS were to block (seL4_Recv) to receive another message, then
-     * the existing reply capability would be deleted. So we save the reply capability
-     * here, as in future you will want to reply to it later. Note that after
-     * saving the reply capability, seL4_Reply cannot be used, as the reply capability
-     * is moved from the internal slot in the TCB to our cspace, and the internal
-     * slot is now empty. */
-    seL4_Error err = cspace_save_reply_cap(&cspace, reply);
-    ZF_LOGF_IFERR(err, "Failed to save reply");
-
-    /* Process system call */
-    switch (syscall_number) {
-    case SOS_SYSCALL0:
-        ZF_LOGV("syscall: thread example made syscall 0!\n");
-        /* construct a reply message of length 1 */
-        seL4_MessageInfo_t reply_msg = seL4_MessageInfo_new(0, 0, 0, 1);
-        /* Set the first (and only) word in the message to 0 */
-        seL4_SetMR(0, 0);
-        /* Send the reply to the saved reply capability. */
-        seL4_Send(reply, reply_msg);
-        /* Free the slot we allocated for the reply - it is now empty, as the reply
-         * capability was consumed by the send. */
-        cspace_free_slot(&cspace, reply);
-        break;
-    case 1:
-        ZF_LOGE("got syscall 1, which we are intentionally not replying to");
-        break;
-
-    case 2:
-        ZF_LOGE("syscall2: with this implemented, rusts .a binary implements sos_write");
-        break;
-
-    default:
-        ZF_LOGE("Unknown syscall %lu\n", syscall_number);
-        /* don't reply to an unknown syscall */
-    }
-}
-
-NORETURN void syscall_loop(seL4_CPtr ep)
-{
-
-    while (1) {
-        seL4_Word badge = 0;
-        /* Block on ep, waiting for an IPC sent over ep, or
-         * a notification from our bound notification object */
-        seL4_MessageInfo_t message = seL4_Recv(ep, &badge);
-        /* Awake! We got a message - check the label and badge to
-         * see what the message is about */
-        seL4_Word label = seL4_MessageInfo_get_label(message);
-
-        if (badge & IRQ_EP_BADGE) {
-            /* It's a notification from our bound notification
-             * object! */
-            sos_handle_irq_notification(&badge);
-        } else if (label == seL4_Fault_NullFault) {
-            /* It's not a fault or an interrupt, it must be an IPC
-             * message from tty_test! */
-            handle_syscall(badge, seL4_MessageInfo_get_length(message) - 1);
-        } else {
-            /* some kind of fault */
-            debug_print_fault(message, TTY_NAME);
-            /* dump registers too */
-            debug_dump_registers(tty_test_process.tcb);
-
-            ZF_LOGF("The SOS skeleton does not know how to handle faults!");
-        }
-    }
-}
-
 /* helper to allocate a ut + cslot, and retype the ut into the cslot */
 static ut_t *alloc_retype(seL4_CPtr *cptr, seL4_Word type, size_t size_bits)
 {
@@ -526,8 +443,7 @@ NORETURN void *main_continued(UNUSED void *arg)
     start_timer(timer_vaddr);
     /* You will need to register an IRQ handler for the timer here.
      * See "irq.h". */
-    serial = serial_init();
-    serial_send(serial, "1 blocks\n", 9);
+
 
     /* Start the user application */
     printf("Start first process\n");
@@ -535,7 +451,7 @@ NORETURN void *main_continued(UNUSED void *arg)
     ZF_LOGF_IF(!success, "Failed to start first process");
 
     printf("\nSOS entering syscall loop\n");
-    syscall_loop(ipc_ep);
+    syscall_loop(ipc_ep, serial, &cspace);
 }
 /*
  * Main entry point - called by crt.
