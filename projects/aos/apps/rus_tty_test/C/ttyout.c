@@ -34,18 +34,6 @@ void ttyout_init(void)
     /* Perform any initialisation you require here */
 }
 
-static size_t sos_debug_print(const void *vData, size_t count)
-{
-#ifdef CONFIG_DEBUG_BUILD
-    size_t i;
-    const char *realdata = vData;
-    for (i = 0; i < count; i++) {
-        seL4_DebugPutChar(realdata[i]);
-    }
-#endif
-    return count;
-}
-
 /* size_t sos_write(void *vData, size_t count) */
 /* { */
 /*     //implement this to use your syscall */

@@ -29,10 +29,23 @@
 
 #include "ttyout.h"
 
+size_t sos_debug_print(const void *vData, size_t count)
+{
+#ifdef CONFIG_DEBUG_BUILD
+  size_t i;
+  const char *realdata = vData;
+  for (i = 0; i < count; i++) {
+    seL4_DebugPutChar(realdata[i]);
+  }
+#endif
+  return count;
+}
+
 void tty_main();
 // Block a thread forever
 // we do this by making an unimplemented system call.
-static void thread_block(void)
+
+void thread_block(void)
 {
     /* construct some info about the IPC message tty_test will send
      * to sos -- it's 1 word long */
@@ -51,14 +64,12 @@ int main(void)
 
     /* initialise communication */
     ttyout_init();
+    sos_debug_print("checking to see if i can printf\n", 32);
 
-
-
-
-    printf("what are you doing here, tty main should have blocked\n");
-    for (uint64_t i = 0; i < ((uint64_t)1<<35); i++) {}
+    printf("foobar\n");
+    printf("500chars00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000054321X0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000054321X0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000054321X0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000054321X00000000000000000054321X");
+    fflush(NULL);
     thread_block();
-    /* abort(); */
 
     return 0;
 }
