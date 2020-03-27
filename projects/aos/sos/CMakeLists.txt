@@ -48,7 +48,7 @@ add_executable(
     src/frame_table.c
     src/irq.c
     src/main.c
-    src/main_loop.c
+    # src/main_loop.c
     src/mapping.c
     src/network.c
     src/ut.c
@@ -80,6 +80,7 @@ target_link_libraries(
     picotcp_bsd
     nfs
     ethernet
+    ${CMAKE_CURRENT_SOURCE_DIR}/rusos/target/aarch64-unknown-linux-musl/release/librusos.a
 )
 
 set_property(

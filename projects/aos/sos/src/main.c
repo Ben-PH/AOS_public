@@ -451,7 +451,7 @@ NORETURN void *main_continued(UNUSED void *arg)
     ZF_LOGF_IF(!success, "Failed to start first process");
 
     printf("\nSOS entering syscall loop\n");
-    syscall_loop(ipc_ep, serial, &cspace);
+    syscall_loop(ipc_ep, serial_init(), &cspace);
 }
 /*
  * Main entry point - called by crt.
