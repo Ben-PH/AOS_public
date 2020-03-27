@@ -50,3 +50,5 @@ NOTE: The project does this with `tools/seL4/cmake-tool/helpers/rootserver.cmake
 14. init the serial device
 15. `start_first_process()` a name (initially `"tty_test"`), and `ipc_ep` capability, which was initialised in `sos_ipc_init(endpointCP, notificactionCP)`
 16. jumps straight into `syscall_loop` with the same `ipc_ep` as its argument.
+17. also gives the pointer to the serial device to allow serial out
+

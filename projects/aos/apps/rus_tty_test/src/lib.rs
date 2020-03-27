@@ -1,6 +1,7 @@
 #![no_std]
 #![feature(lang_items)]
 
+// TODO: use `aos/rustlibs/debug_print` crate
 mod debug_print;
 
 #[lang = "eh_personality"] extern fn eh_personality() {}
