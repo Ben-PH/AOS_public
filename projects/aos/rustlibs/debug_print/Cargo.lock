@@ -3,10 +3,3 @@
 [[package]]
 name = "debug_print"
 version = "0.1.0"
-
-[[package]]
-name = "rusos"
-version = "0.1.0"
-dependencies = [
- "debug_print",
-]
