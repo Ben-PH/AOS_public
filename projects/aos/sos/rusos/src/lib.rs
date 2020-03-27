@@ -94,7 +94,7 @@ fn handle_syscall(_badge: u64, num_args: u32, serial: *mut core::ffi::c_void, cs
             ros_debug_print(b"in dummy syscall 1\n");
             Ok(())}, // intentionally not replying to syscall 1
         2 => {
-            serial_send(serial, "change rusos/lib.rs to complete implementation of tty_out\n".as_ptr(), 58);
+            unsafe { serial_send(serial, "change rusos/lib.rs to complete implementation of tty_out\n".as_ptr(), 58); }
             Ok(())
         }, // print out with serial send
         _ => Err(())

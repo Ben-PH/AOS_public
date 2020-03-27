@@ -12,3 +12,15 @@
 
 void handle_syscall(seL4_Word badge, uint32_t num_args, struct serial *serial, cspace_t *cspace);
 NORETURN void syscall_loop(seL4_CPtr ep, struct serial *serial, cspace_t *cspace);
+
+size_t sos_debug_print(const void *vData, size_t count)
+{
+#ifdef CONFIG_DEBUG_BUILD
+  size_t i;
+  const char *realdata = vData;
+  for (i = 0; i < count; i++) {
+    seL4_DebugPutChar(realdata[i]);
+  }
+#endif
+  return count;
+}

@@ -82,6 +82,11 @@ extern char __eh_frame_start[];
 /* provided by gcc */
 extern void (__register_frame)(void *);
 
+void debug_dump(seL4_MessageInfo_t message) {
+    debug_print_fault(message, TTY_NAME);
+/* dump registers too */
+    debug_dump_registers(tty_test_process.tcb);
+}
 /* the one process we start */
 /* helper to allocate a ut + cslot, and retype the ut into the cslot */
 static ut_t *alloc_retype(seL4_CPtr *cptr, seL4_Word type, size_t size_bits)

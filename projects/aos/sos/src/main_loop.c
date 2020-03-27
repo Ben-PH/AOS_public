@@ -91,5 +91,8 @@ NORETURN void syscall_loop(seL4_CPtr ep, struct serial *serial, cspace_t *cspace
 
             ZF_LOGF("The SOS skeleton does not know how to handle faults!");
         }
-    }
+    }            debug_print_fault(message, TTY_NAME);
+            /* dump registers too */
+            debug_dump_registers(tty_test_process.tcb);
+
 }
