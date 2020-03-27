@@ -1,0 +1,2 @@
+target/**/*
+!target/aarch64-unknown-linux/release/librusos.a
