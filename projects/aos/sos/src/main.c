@@ -36,7 +36,6 @@
 #include "elfload.h"
 #include "syscalls.h"
 #include "tests.h"
-#include "main_loop.h"
 
 #include <aos/vsyscall.h>
 
@@ -49,15 +48,30 @@
  * All badged IRQs set high bet, then we use uniqe bits to
  * distinguish interrupt sources.
  */
+#define IRQ_EP_BADGE         BIT(seL4_BadgeBits - 1ul)
 #define IRQ_IDENT_BADGE_BITS MASK(seL4_BadgeBits - 1ul)
 
 #define TTY_PRIORITY         (0)
 #define TTY_EP_BADGE         (101)
 
-// TODO clear this up when happy with it being in main_loop.c?
-struct serial *serial;
-
+/* the one process we start */
 #define TTY_NAME             "tty_test"
+
+// TODO: Move to a rust bindings .h file?
+void handle_syscall(seL4_Word badge, uint32_t num_args, struct serial *serial, cspace_t *cspace);
+NORETURN void syscall_loop(seL4_CPtr ep, struct serial *serial, cspace_t *cspace);
+
+size_t sos_debug_print(const void *vData, size_t count)
+{
+#ifdef CONFIG_DEBUG_BUILD
+  size_t i;
+  const char *realdata = vData;
+  for (i = 0; i < count; i++) {
+    seL4_DebugPutChar(realdata[i]);
+  }
+#endif
+  return count;
+}
 
 static struct {
   ut_t *tcb_ut;
@@ -74,6 +88,7 @@ static struct {
   seL4_CPtr stack;
 } tty_test_process;
 static cspace_t cspace;
+
 /* The linker will link this symbol to the start address  *
  * of an archive of attached applications.                */
 extern char _cpio_archive[];
@@ -82,12 +97,12 @@ extern char __eh_frame_start[];
 /* provided by gcc */
 extern void (__register_frame)(void *);
 
+// Something for syscall loop to manage. needs to be here to access tty_tesst_proc struct
 void debug_dump(seL4_MessageInfo_t message) {
     debug_print_fault(message, TTY_NAME);
-/* dump registers too */
+    /* dump registers too */
     debug_dump_registers(tty_test_process.tcb);
 }
-/* the one process we start */
 /* helper to allocate a ut + cslot, and retype the ut into the cslot */
 static ut_t *alloc_retype(seL4_CPtr *cptr, seL4_Word type, size_t size_bits)
 {
@@ -449,6 +464,8 @@ NORETURN void *main_continued(UNUSED void *arg)
     /* You will need to register an IRQ handler for the timer here.
      * See "irq.h". */
 
+    struct serial *serial = serial_init();
+    ZF_LOGE_IF(serial == NULL, "serial_init fail");
 
     /* Start the user application */
     printf("Start first process\n");
@@ -456,7 +473,8 @@ NORETURN void *main_continued(UNUSED void *arg)
     ZF_LOGF_IF(!success, "Failed to start first process");
 
     printf("\nSOS entering syscall loop\n");
-    syscall_loop(ipc_ep, serial_init(), &cspace);
+    syscall_loop(ipc_ep, serial, &cspace);
+    UNREACHABLE();
 }
 /*
  * Main entry point - called by crt.
