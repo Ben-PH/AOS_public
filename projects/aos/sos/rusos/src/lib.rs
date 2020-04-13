@@ -3,7 +3,7 @@
 
 use debug_print::*;
 
-pub const IRQ_EP_BADGE: u64 = 0b1000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000;
+pub const IRQ_EP_BADGE: u64 = 1u64 << 63;
 
 #[lang = "eh_personality"] extern fn eh_personality() {}
 #[panic_handler]
